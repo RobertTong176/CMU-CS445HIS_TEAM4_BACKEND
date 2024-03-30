@@ -4,6 +4,7 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import { connectMongoDb } from './src/configs/connectMongoDb.js';
 const app = express();
 dotenv.config();
 const port = process.env.PORT || 8000;
@@ -54,6 +55,7 @@ app.get('/', (req, res) => {
 //     });
 // });
 
+connectMongoDb();
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`);
 });
