@@ -4,18 +4,43 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { connectMongoDb } from './src/configs/connectMongoDb.js';
-const app = express();
+import { GET_MONGO_DB, CONNECT_MONGO_DB } from './src/configs/connectMongoDb.js';
 dotenv.config();
-const port = process.env.PORT || 8000;
+const app = express();
+const START_SERVER = () => {
+    const port = process.env.PORT || 8000;
 
-app.use(cors());
-app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(cors());
+    app.use(express.json());
+    app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+    app.get('/', async (req, res) => {
+        console.log(await GET_MONGO_DB().listCollections().toArray());
+        res.send('Hello World!');
+    });
+    app.listen(port, () => {
+        console.log(`Example app listening at http://localhost:${port}`);
+    });
+};
+
+CONNECT_MONGO_DB()
+    .then(() => {
+        console.log('Connected to database!');
+    })
+    .then(() => START_SERVER())
+    .catch((error) => {
+        console.error(error);
+        process.exit();
+    });
+
+// try {
+//   const [results, fields] = await connection.query("SELECT * FROM `pay rates`");
+
+//   console.log(results); // results contains rows returned by server
+//   console.log(fields); // fields contains extra meta data about results, if available
+// } catch (err) {
+//   console.log(err);
+// }
 
 // const configSql = {
 //     server: 'DESKTOP-VIS0R2A\\SQLEXPRESS',
@@ -54,17 +79,3 @@ app.get('/', (req, res) => {
 //         }
 //     });
 // });
-
-connectMongoDb();
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-});
-
-// try {
-//   const [results, fields] = await connection.query("SELECT * FROM `pay rates`");
-
-//   console.log(results); // results contains rows returned by server
-//   console.log(fields); // fields contains extra meta data about results, if available
-// } catch (err) {
-//   console.log(err);
-// }
