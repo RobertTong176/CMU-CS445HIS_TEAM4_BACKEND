@@ -4,7 +4,7 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { GET_MONGO_DB, CONNECT_MONGO_DB } from './src/configs/connectMongoDb.js';
+import { GET_MONGO_DB, CONNECT_MONGO_DB } from '~/configs/connectMongoDb.js';
 dotenv.config();
 const app = express();
 const START_SERVER = () => {
