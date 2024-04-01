@@ -1,5 +1,4 @@
-.env
-
+/node_modules
 #production
 /build
 
@@ -10,3 +9,4 @@
 .env.development.local
 
 .env
+
