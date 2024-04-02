@@ -1,11 +1,15 @@
 import express from 'express';
 import sql from 'mssql/msnodesqlv8.js';
 import mysql from 'mysql2/promise';
+// import exitHook from 'exit-hook';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import { GET_MONGO_DB, CONNECT_MONGO_DB } from '~/configs/connectMongoDb.js';
+import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware';
+import { APIs_V1 } from '~/routes/v1';
 dotenv.config();
+
 const app = express();
 const START_SERVER = () => {
     const port = process.env.PORT || 8000;
@@ -13,19 +17,22 @@ const START_SERVER = () => {
     app.use(cors());
     app.use(express.json());
     app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
 
-    app.get('/', async (req, res) => {
-        console.log(await GET_MONGO_DB().listCollections().toArray());
-        res.send('Hello World!');
-    });
+    app.use('/v1', APIs_V1);
+
+    //Error handling middleware concentrate
+    app.use(errorHandlingMiddleware);
+
     app.listen(port, () => {
         console.log(`Example app listening at http://localhost:${port}`);
     });
 };
 
+//connect mongo alias
 CONNECT_MONGO_DB()
     .then(() => {
-        console.log('Connected to database!');
+        console.log('Connected to database mongoDB!');
     })
     .then(() => START_SERVER())
     .catch((error) => {

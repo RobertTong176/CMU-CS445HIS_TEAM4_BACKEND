@@ -4,7 +4,6 @@ const userSchema = new Schema(
     {
         name: {
             type: String,
-            required: [true, 'Please, Enter your email!'],
             maxLength: [50, 'Name cannot exceed 50 characters'],
             minLength: [2, 'Name should have more than 2 characters'],
         },
@@ -19,6 +18,13 @@ const userSchema = new Schema(
             minLength: [8, 'Password must be at least 8 characters'],
         },
         isAdmin: {
+            type: Boolean,
+            default: false,
+        },
+        address: {
+            type: String,
+        },
+        _destroy: {
             type: Boolean,
             default: false,
         },
