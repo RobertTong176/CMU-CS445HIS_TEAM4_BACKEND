@@ -1,9 +1,11 @@
 import Joi from 'joi';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/middlewares/ApiError';
+import { validateObjectId } from '~/utils/algorithms';
 
 const createNewUser = async (req, res, next) => {
     const correctCondition = Joi.object({
+        name: Joi.string().required().trim().strict().messages({}),
         email: Joi.string().required().email().trim().strict(),
         password: Joi.string()
             .required()
@@ -12,7 +14,7 @@ const createNewUser = async (req, res, next) => {
             .strict()
             .label('Password')
             .messages({
-                'object.regex': 'Password must include capital letters, numbers and special characters',
+                'string.regex': 'Password must include capital letters, numbers and special characters',
             }),
     });
 
@@ -20,15 +22,27 @@ const createNewUser = async (req, res, next) => {
         await correctCondition.validateAsync(req.body, {
             abortEarly: false,
         });
-        res.status(StatusCodes.CREATED).json({ message: 'created new user' });
+        next();
     } catch (error) {
-        console.log(error);
         const errorMessage = new Error(error).message;
         const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage);
         next(customError);
     }
 };
 
+const getUser = async (req, res, next) => {
+    try {
+        const userId = req.params.id;
+        if (!validateObjectId(userId)) {
+            throw new ApiError(StatusCodes.BAD_REQUEST, 'User Id is required!');
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const userValidate = {
     createNewUser,
+    getUser,
 };

@@ -4,6 +4,7 @@ const userSchema = new Schema(
     {
         name: {
             type: String,
+            require: true,
             maxLength: [50, 'Name cannot exceed 50 characters'],
             minLength: [2, 'Name should have more than 2 characters'],
         },
@@ -23,6 +24,10 @@ const userSchema = new Schema(
         },
         address: {
             type: String,
+        },
+        isVerify: {
+            type: Boolean,
+            default: false,
         },
         _destroy: {
             type: Boolean,
