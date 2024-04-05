@@ -25,7 +25,7 @@ const userSchema = new Schema(
         address: {
             type: String,
         },
-        isVerify: {
+        isVerified: {
             type: Boolean,
             default: false,
         },
@@ -39,6 +39,7 @@ const userSchema = new Schema(
         },
         resetPasswordToken: { type: String },
         resetPasswordExpires: { type: Date },
+        emailToken: { type: String },
     },
     { timestamps: true },
 );

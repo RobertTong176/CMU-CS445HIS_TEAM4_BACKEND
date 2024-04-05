@@ -6,7 +6,6 @@ import { sendEmail } from '~/utils/sendEmail';
 const createNewUser = async (req, res, next) => {
     try {
         const newUser = await userService.createNewUser(req.body);
-        await sendEmail('truonglamdev070303@gmail.com', 'Xin chao lamtruongdev', 'verify email');
         res.status(StatusCodes.CREATED).json({
             user: newUser,
             message: 'Created new user successfully',
@@ -31,10 +30,33 @@ const getUser = async (req, res, next) => {
     }
 };
 
-const login = async (req, res, next) => {};
+const verifyEmail = async (req, res, next) => {
+    try {
+        const user = await userService.verifyEmail(req.params);
+        res.status(StatusCodes.CREATED).json({
+            user: user,
+            message: 'Verified successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const login = async (req, res, next) => {
+    try {
+        const user = await userService.login(req.body);
+        res.status(StatusCodes.CREATED).json({
+            user: user,
+            message: 'Login successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const userController = {
     createNewUser,
     getUser,
+    verifyEmail,
     login,
 };

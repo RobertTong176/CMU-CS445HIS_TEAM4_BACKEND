@@ -3,6 +3,6 @@ import { userRoute } from './userRoute';
 
 const router = express.Router();
 
-router.use('/users', userRoute);
+router.use('/user', userRoute);
 
 export const APIs_V1 = router;
