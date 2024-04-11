@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { GET_MONGO_DB, CONNECT_MONGO_DB } from '~/configs/connectMongoDb.js';
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware';
 import { APIs_V1 } from '~/routes/v1';
+import { CONNECT_MYSQL_DB } from '~/configs/connectMySql';
 dotenv.config();
 
 const app = express();
@@ -40,13 +41,25 @@ CONNECT_MONGO_DB()
         process.exit();
     });
 
-// try {
-//   const [results, fields] = await connection.query("SELECT * FROM `pay rates`");
+(async () => await CONNECT_MYSQL_DB())();
 
-//   console.log(results); // results contains rows returned by server
-//   console.log(fields); // fields contains extra meta data about results, if available
+// const pool = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'root',
+//     password: '070303',
+//     database: 'mydb',
+//     // host: 'localhost',
+//     // user: 'root',
+//     // database: 'mydb',
+// });
+// const connection =  pool.getConnection();
+// try {
+//     const [results, fields] = connection.query('SELECT * FROM `pay rates`');
+
+//     console.log(results); // results contains rows returned by server
+//     console.log(fields); // fields contains extra meta data about results, if available
 // } catch (err) {
-//   console.log(err);
+//     console.log(err);
 // }
 
 // const configSql = {

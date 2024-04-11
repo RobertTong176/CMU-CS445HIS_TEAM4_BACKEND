@@ -21,3 +21,25 @@ export const isTokenExpired = (token) => {
     const currentTimestamp = Math.floor(Date.now() / 1000);
     return decodedToken.payload.exp < currentTimestamp;
 };
+
+export const generateAccessToken = (payload) => {
+    try {
+        const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+        });
+        return accessToken;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const generateRefreshToken = (payload) => {
+    try {
+        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+        });
+        return refreshToken;
+    } catch (error) {
+        throw error;
+    }
+};

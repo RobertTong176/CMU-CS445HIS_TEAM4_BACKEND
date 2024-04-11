@@ -1,9 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/middlewares/ApiError';
 import User from '~/models/userModel';
-import { hashPassword, isTokenExpired } from '~/utils/algorithms';
+import { generateAccessToken, generateRefreshToken, hashPassword, isTokenExpired } from '~/utils/algorithms';
 import jwt from 'jsonwebtoken';
 import { sendEmail } from '~/utils/sendEmail';
+import bcrypt from 'bcrypt';
 
 const createNewUser = async (data) => {
     try {
@@ -73,11 +74,36 @@ const verifyEmail = async (data) => {
 const login = async (data) => {
     try {
         const { email, password } = data;
-        ;
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+        }
+        if (!user.isVerified) {
+            throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, 'Please verify your account via email.');
+        }
+        //confirm password saved database
+        const isConfirmPassword = await bcrypt.compare(password, user.password);
+        if (!isConfirmPassword) {
+            throw new ApiError(StatusCodes.UNAUTHORIZED, 'Incorrect password ,please enter again!');
+        }
+
+        //create token jwt
+        const accessToken = generateAccessToken({ id: user._id, isAdmin: user.isAdmin });
+        const refreshToken = generateRefreshToken({ id: user._id, isAdmin: user.isAdmin });
+        const newUser = user.toObject();
+        delete newUser.password;
+        const response = {
+            ...newUser,
+            accessToken,
+            refreshToken,
+        };
+        return response;
     } catch (error) {
         throw error;
     }
 };
+
+
 
 export const userService = {
     createNewUser,
