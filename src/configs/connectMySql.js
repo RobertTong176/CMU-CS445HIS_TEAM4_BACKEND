@@ -1,4 +1,5 @@
-import mysql from 'mysql2/promise';
+// import mysql from 'mysql2/promise';
+import mysql from 'mysql';
 
 const configMysql = {
     host: 'localhost',
@@ -7,14 +8,22 @@ const configMysql = {
     database: 'mydb',
 };
 
+let connection;
 export const CONNECT_MYSQL_DB = async () => {
-    const connection = await mysql.createPool(configMysql);
-    try {
-        const [results, fields] = await connection.query('SELECT * FROM `pay rates`');
+    connection = mysql.createConnection(configMysql);
+    connection.connect((error) => {
+        if (error) {
+            console.log('Failed to connect to MySQL database!');
+            console.log(error);
+            return;
+        }
+        console.log('Connected to MySQL database!');
+    });
+};
 
-        console.log(results); // results contains rows returned by server
-        console.log(fields);
-    } catch (error) {
-        console.log(error);
+export const GET_CONNECTION_MYSQL = () => {
+    if (!connection) {
+        throw new Error('MySQL connection has not been established yet!');
     }
+    return connection;
 };

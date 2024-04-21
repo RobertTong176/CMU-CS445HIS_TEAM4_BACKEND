@@ -1,10 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/middlewares/ApiError';
 import { userService } from '~/services/userService';
-import { sendEmail } from '~/utils/sendEmail';
 
 const createNewUser = async (req, res, next) => {
     try {
+        console.log('check dataa', req.body);
         const newUser = await userService.createNewUser(req.body);
         res.status(StatusCodes.CREATED).json({
             user: newUser,
@@ -54,9 +54,22 @@ const login = async (req, res, next) => {
     }
 };
 
+const refreshToken = async (req, res, next) => {
+    try {
+        const response = await userService.refreshToken(req.body);
+        res.status(StatusCodes.CREATED).json({
+            accessToken: response,
+            message: 'Refresh token successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const userController = {
     createNewUser,
     getUser,
     verifyEmail,
     login,
+    refreshToken,
 };

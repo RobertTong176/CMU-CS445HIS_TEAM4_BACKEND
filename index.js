@@ -1,14 +1,14 @@
 import express from 'express';
-import sql from 'mssql/msnodesqlv8.js';
-import mysql from 'mysql2/promise';
 // import exitHook from 'exit-hook';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import { GET_MONGO_DB, CONNECT_MONGO_DB } from '~/configs/connectMongoDb.js';
+import { CONNECT_MONGO_DB } from '~/configs/connectMongoDb.js';
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware';
 import { APIs_V1 } from '~/routes/v1';
+import { CONNECT_SQL_DB } from '~/configs/connectSqlDb';
 import { CONNECT_MYSQL_DB } from '~/configs/connectMySql';
+// import { CONNECT_MYSQL_DB } from '~/configs/connectMySql';
 dotenv.config();
 
 const app = express();
@@ -35,13 +35,17 @@ CONNECT_MONGO_DB()
     .then(() => {
         console.log('Connected to database mongoDB!');
     })
-    .then(() => START_SERVER())
+    .then(() => {
+        (async () => await CONNECT_MYSQL_DB())();
+        CONNECT_SQL_DB();
+        START_SERVER();
+    })
     .catch((error) => {
         console.error(error);
         process.exit();
     });
 
-(async () => await CONNECT_MYSQL_DB())();
+// (async () => await CONNECT_MYSQL_DB())();
 
 // const pool = mysql.createConnection({
 //     host: 'localhost',
@@ -62,15 +66,6 @@ CONNECT_MONGO_DB()
 //     console.log(err);
 // }
 
-// const configSql = {
-//     server: 'DESKTOP-VIS0R2A\\SQLEXPRESS',
-//     database: 'HR',
-//     options: {
-//         trustedConnection: true,
-//     },
-//     driver: 'msnodesqlv8',
-// };
-
 // const configMysql = {
 //     user: 'root',
 //     password: '070303',
@@ -84,18 +79,4 @@ CONNECT_MONGO_DB()
 //     database: 'payrollDB',
 // });
 
-// sql.connect(configSql, function (err) {
-//     if (err) console.log(err);
 
-//     var request = new sql.Request();
-//     console.log('Running query');
-
-//     var query = 'select * from Benefit_Plans';
-//     request.query(query, function (err, records) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             console.log(records); //
-//         }
-//     });
-// });

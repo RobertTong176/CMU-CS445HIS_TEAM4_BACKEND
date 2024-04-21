@@ -1,7 +1,13 @@
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '~/middlewares/ApiError';
 import User from '~/models/userModel';
-import { generateAccessToken, generateRefreshToken, hashPassword, isTokenExpired } from '~/utils/algorithms';
+import {
+    generateAccessToken,
+    generateRefreshToken,
+    hashPassword,
+    isTokenExpired,
+    refreshNewToken,
+} from '~/utils/algorithms';
 import jwt from 'jsonwebtoken';
 import { sendEmail } from '~/utils/sendEmail';
 import bcrypt from 'bcrypt';
@@ -31,7 +37,8 @@ const createNewUser = async (data) => {
         response.emailToken = emailToken;
         response.save();
 
-        const EmailMessage = `${process.env.BASE_URL}/user/verify/${response._id}/${emailToken}`;
+        const EmailMessage = `http://localhost:5173/user/verify/${response._id}/${emailToken}`;
+        // const EmailMessage = `${process.env.BASE_URL}/user/verify/${response._id}/${emailToken}`;
 
         await sendEmail(data.email, 'Verify email', EmailMessage);
 
@@ -63,7 +70,11 @@ const verifyEmail = async (data) => {
         const user = await User.findOne({ _id: id, emailToken: token });
         if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid link ');
 
-        const verified = await User.findOneAndUpdate({ _id: id }, { emailToken: '', isVerified: true });
+        const verified = await User.findOneAndUpdate(
+            { _id: id, emailToken: token },
+            { $set: { emailToken: '', isVerified: true } },
+            { new: true },
+        );
         delete verified.toObject().password;
         return verified;
     } catch (error) {
@@ -103,11 +114,22 @@ const login = async (data) => {
     }
 };
 
-
+const refreshToken = async (data) => {
+    try {
+        const { refreshToken } = data;
+        if (!refreshToken) {
+            throw new ApiError(404, 'Refresh token not found!');
+        }
+        return await refreshNewToken(refreshToken);
+    } catch (error) {
+        throw error;
+    }
+};
 
 export const userService = {
     createNewUser,
     getUser,
     verifyEmail,
     login,
+    refreshToken,
 };

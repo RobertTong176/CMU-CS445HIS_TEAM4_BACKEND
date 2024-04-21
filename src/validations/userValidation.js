@@ -9,13 +9,10 @@ const createNewUser = async (req, res, next) => {
         email: Joi.string().required().email().trim().strict(),
         password: Joi.string()
             .required()
-            .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,1024}$/)
+            // .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,1024}$/)
             .trim()
             .strict()
-            .label('Password')
-            .messages({
-                'string.regex': 'Password must include capital letters, numbers and special characters',
-            }),
+            .label('Password'),
     });
 
     try {

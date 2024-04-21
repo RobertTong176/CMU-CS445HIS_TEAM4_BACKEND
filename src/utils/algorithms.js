@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import ApiError from '~/middlewares/ApiError';
 
 export const hashPassword = async (password) => {
     if (!password) return '';
@@ -41,5 +42,27 @@ export const generateRefreshToken = (payload) => {
         return refreshToken;
     } catch (error) {
         throw error;
+    }
+};
+export const refreshNewToken = async (token) => {
+    try {
+        // Verify the refresh token
+        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+
+        // Generate a new access token using the decoded user information
+        const newAccessToken = generateAccessToken({
+            id: decoded.id,
+            isAdmin: decoded.isAdmin,
+        });
+
+        return newAccessToken;
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            // If the refresh token has expired, throw an error
+            throw new ApiError(403, 'Refresh token expired');
+        } else {
+            // For other verification errors, throw a generic error
+            throw new ApiError(403, 'Failed to verify refresh token');
+        }
     }
 };

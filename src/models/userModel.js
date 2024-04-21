@@ -22,6 +22,10 @@ const userSchema = new Schema(
             type: Boolean,
             default: false,
         },
+        isBlock: {
+            type: Boolean,
+            default: false,
+        },
         address: {
             type: String,
         },
@@ -37,6 +41,7 @@ const userSchema = new Schema(
             public_id: String,
             url: String,
         },
+
         resetPasswordToken: { type: String },
         resetPasswordExpires: { type: Date },
         emailToken: { type: String },

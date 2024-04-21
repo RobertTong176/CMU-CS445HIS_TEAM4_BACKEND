@@ -1,8 +1,10 @@
 import express from 'express';
 import { adminController } from '~/controllers/adminController';
-import { authMiddleware } from '~/middlewares/authMiddleware';
+import { authMiddleware, authorizeUser } from '~/middlewares/authMiddleware';
 
 const Router = express.Router();
 
-Router.get('/users', authMiddleware, adminController.getAllUsers);
+Router.get('/users', adminController.getAllUsers);
+// Router.get('/users', authorizeUser, adminController.getAllUsers);
+Router.post('/user/:id', authorizeUser, adminController.blockUser);
 export const adminRoute = Router;
