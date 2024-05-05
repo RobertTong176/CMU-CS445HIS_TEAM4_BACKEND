@@ -75,6 +75,7 @@ const getAllPayRates = async (req, res, next) => {
 const getAllEmployeePayroll = async (req, res, next) => {
     try {
         const response = await viewService.getAllEmployeePayroll();
+
         res.status(StatusCodes.CREATED).json({
             data: response,
             message: 'Successfully',
@@ -119,6 +120,19 @@ const getAllEmployeeBirthday = async (req, res, next) => {
         next(error);
     }
 };
+
+const getAllDepartment = async (req, res, next) => {
+    try {
+        const response = await viewService.getAllDepartment();
+        res.status(StatusCodes.CREATED).json({
+            data: response,
+            message: 'Successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const viewController = {
     getAllPersonal,
     getAllEmployment,
@@ -130,4 +144,5 @@ export const viewController = {
     filterEmployeeHuman,
     filterEmployeePayroll,
     getAllEmployeeBirthday,
+    getAllDepartment,
 };

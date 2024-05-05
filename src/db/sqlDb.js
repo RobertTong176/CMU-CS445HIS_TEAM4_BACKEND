@@ -1,0 +1,39 @@
+import sql from 'mssql/msnodesqlv8.js';
+
+const getAllDataSqlDb = async () => {
+    const query = `SELECT 
+    P.*,
+    E.EMPLOYMENT_CODE,
+    E.EMPLOYMENT_STATUS,
+    E.HIRE_DATE_FOR_WORKING,
+    E.WORKERS_COMP_CODE,
+    E.TERMINATION_DATE,
+    E.REHIRE_DATE_FOR_WORKING,
+    E.LAST_REVIEW_DATE,
+    B.PLAN_NAME,
+    J.DEPARTMENT,
+    J.DIVISION,
+    J.FROM_DATE AS JOB_FROM_DATE,
+    J.THRU_DATE AS JOB_THRU_DATE,
+    J.JOB_TITLE,
+    J.SUPERVISOR,
+    J.LOCATION,
+    WT.YEAR_WORKING,
+    WT.MONTH_WORKING
+FROM 
+    PERSONAL P
+LEFT JOIN 
+    EMPLOYMENT E ON P.PERSONAL_ID = E.EMPLOYMENT_ID
+LEFT JOIN 
+    JOB_HISTORY J ON E.EMPLOYMENT_ID = J.EMPLOYMENT_ID
+LEFT JOIN 
+    EMPLOYMENT_WORKING_TIME WT ON E.EMPLOYMENT_ID = WT.EMPLOYMENT_ID
+LEFT JOIN 
+    BENEFIT_PLANS B ON P.PERSONAL_ID = B.BENEFIT_PLANS_ID;`;
+    const request = new sql.Request();
+
+    const response = await request.query(query);
+    return response;
+};
+
+export { getAllDataSqlDb };

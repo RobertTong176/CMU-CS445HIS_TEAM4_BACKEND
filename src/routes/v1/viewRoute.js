@@ -10,6 +10,7 @@ Router.get('/job-history', authMiddleware, viewController.getAllJobHistory);
 Router.get('/employment-working-time', authMiddleware, viewController.getAllEmploymentWorkingTime);
 Router.get('/pay-rates', authMiddleware, viewController.getAllPayRates);
 Router.get('/employee/birthday', authMiddleware, viewController.getAllEmployeeBirthday);
+Router.get('/employee/department', viewController.getAllDepartment);
 Router.get('/employee', authMiddleware, viewController.getAllEmployeePayroll);
 
 Router.get('/human/employees', authMiddleware, viewController.filterEmployeeHuman);

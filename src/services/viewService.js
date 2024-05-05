@@ -1,5 +1,8 @@
 import sql from 'mssql/msnodesqlv8.js';
 import { GET_CONNECTION_MYSQL } from '~/configs/connectMySql';
+import { getAllDataMySqlDb } from '~/db/mySqlDb';
+import { getAllDataSqlDb } from '~/db/sqlDb';
+import { countFields, mergedArray } from '~/utils/algorithms';
 
 const getAllPersonal = async () => {
     try {
@@ -92,51 +95,47 @@ const getAllEmployeePayroll = async () => {
     });
 };
 
-const filterEmployeeHuman = async (queryStr) => {
+const filterEmployeeHuman = async (filters) => {
     try {
-        const { gender, ethnicity, partTime, fullTime, shareholder } = queryStr;
-        const request = new sql.Request();
-        const query = `SELECT 
-    P.*,
-    E.EMPLOYMENT_CODE,
-    E.EMPLOYMENT_STATUS,
-    E.HIRE_DATE_FOR_WORKING,
-    E.WORKERS_COMP_CODE,
-    E.TERMINATION_DATE,
-    E.REHIRE_DATE_FOR_WORKING,
-    E.LAST_REVIEW_DATE,
-    B.PLAN_NAME,
-    J.DEPARTMENT,
-    J.DIVISION,
-    J.FROM_DATE AS JOB_FROM_DATE,
-    J.THRU_DATE AS JOB_THRU_DATE,
-    J.JOB_TITLE,
-    J.SUPERVISOR,
-    J.LOCATION,
-    WT.YEAR_WORKING,
-    WT.MONTH_WORKING
-FROM 
-    PERSONAL P
-LEFT JOIN 
-    EMPLOYMENT E ON P.PERSONAL_ID = E.EMPLOYMENT_ID
-LEFT JOIN 
-    JOB_HISTORY J ON E.EMPLOYMENT_ID = J.EMPLOYMENT_ID
-LEFT JOIN 
-    EMPLOYMENT_WORKING_TIME WT ON E.EMPLOYMENT_ID = WT.EMPLOYMENT_ID
-LEFT JOIN 
-    BENEFIT_PLANS B ON P.PERSONAL_ID = B.BENEFIT_PLANS_ID;`;
+        if (filters['SHAREHOLDER_STATUS']) {
+            filters['SHAREHOLDER_STATUS'] = +filters['SHAREHOLDER_STATUS'];
+        }
+        const humanData = await getAllDataSqlDb();
+        const payrollData = await getAllDataMySqlDb();
+        const filterData = mergedArray(humanData?.recordsets[0], payrollData);
 
-        const response = await request.query(query);
-        let filteredEmployees = response?.recordsets[0].filter((employee) => {
-            if (gender && employee.CURRENT_GENDER !== gender) return false;
-            if (ethnicity && employee.ETHNICITY !== ethnicity) return false;
-            if (partTime && employee.EMPLOYMENT_STATUS !== 'Nam') return false;
-            if (fullTime && employee.EMPLOYMENT_STATUS !== 'Nữ') return false;
-            if (shareholder && employee.SHAREHOLDER_STATUS !== +shareholder) return false;
-
-            return true;
+        let filteredEmployees = filterData.filter((item) => {
+            let match = true;
+            for (let key in filters) {
+                if (filters.hasOwnProperty(key)) {
+                    if (filters[key] === 'All') {
+                        break;
+                    }
+                    if (item[key] !== filters[key]) {
+                        match = false;
+                        break;
+                    }
+                }
+            }
+            return match;
         });
-        return filteredEmployees || [];
+
+        let viewData = [];
+        let totalEarningCurrentYear = 0;
+        let totalEarningLastYear = 0;
+
+        if (filteredEmployees.length > 0) {
+            filteredEmployees.map((item) => {
+                let total = item.Value - item['Tax Percentage'] + item['Pay Amount'];
+                const earningCurrentYear = total * item['Paid To Date'];
+                const earningLastYear = total * item['Paid Last Year'];
+                totalEarningCurrentYear += earningCurrentYear;
+                totalEarningLastYear += earningLastYear;
+                viewData.push({ ...item, earningCurrentYear, earningLastYear });
+            });
+        }
+
+        return { viewData, totalEarningCurrentYear, totalEarningLastYear };
     } catch (error) {
         throw error;
     }
@@ -153,8 +152,20 @@ const getAllEmployeeBirthday = async (data) => {
         WHERE MONTH(BIRTH_DATE) = ${currentMonth} 
     `;
         const response = await request.query(query);
-        console.log(response);
         return response?.recordsets[0] || [];
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getAllDepartment = async () => {
+    try {
+        const humanData = await getAllDataSqlDb();
+        const payrollData = await getAllDataMySqlDb();
+        const allData = mergedArray(humanData?.recordsets[0], payrollData);
+
+        const results = countFields(allData);
+        return results;
     } catch (error) {
         throw error;
     }
@@ -170,4 +181,5 @@ export const viewService = {
     getAllEmployeePayroll,
     filterEmployeeHuman,
     getAllEmployeeBirthday,
+    getAllDepartment,
 };

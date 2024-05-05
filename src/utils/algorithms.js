@@ -66,3 +66,37 @@ export const refreshNewToken = async (token) => {
         }
     }
 };
+
+export const mergedArray = (array1 = [], array2 = []) => {
+    let result = [];
+    array1.forEach((item1) => {
+        let matchingData = array2.find((item2) => {
+            return item2.idEmployee === item1.PERSONAL_ID;
+        });
+        if (matchingData) {
+            result.push({ ...item1, ...matchingData });
+        }
+    });
+
+    return result;
+};
+
+export const countFields = (arr) => {
+    const departmentCounts = {};
+
+    arr.forEach((employee) => {
+        const department = employee.DEPARTMENT;
+        if (departmentCounts.hasOwnProperty(department)) {
+            departmentCounts[department]++;
+        } else {
+            departmentCounts[department] = 1;
+        }
+    });
+
+    const result = [];
+    for (const department in departmentCounts) {
+        result.push({ value: departmentCounts[department], label: department });
+    }
+
+    return result;
+};
