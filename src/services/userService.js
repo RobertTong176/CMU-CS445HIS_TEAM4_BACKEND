@@ -37,7 +37,7 @@ const createNewUser = async (data) => {
         response.emailToken = emailToken;
         response.save();
 
-        const EmailMessage = `http://localhost:5173/user/verify/${response._id}/${emailToken}`;
+        const EmailMessage = `http://localhost:4000/user/verify/${response._id}/${emailToken}`;
         // const EmailMessage = `${process.env.BASE_URL}/user/verify/${response._id}/${emailToken}`;
 
         await sendEmail(data.email, 'Verify email', EmailMessage);

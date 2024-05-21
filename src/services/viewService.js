@@ -123,19 +123,21 @@ const filterEmployeeHuman = async (filters) => {
         let viewData = [];
         let totalEarningCurrentYear = 0;
         let totalEarningLastYear = 0;
+        let totalVacationDay = 0;
 
         if (filteredEmployees.length > 0) {
             filteredEmployees.map((item) => {
                 let total = item.Value - item['Tax Percentage'] + item['Pay Amount'];
                 const earningCurrentYear = total * item['Paid To Date'];
                 const earningLastYear = total * item['Paid Last Year'];
+                totalVacationDay += item['Vacation Days'];
                 totalEarningCurrentYear += earningCurrentYear;
                 totalEarningLastYear += earningLastYear;
                 viewData.push({ ...item, earningCurrentYear, earningLastYear });
             });
         }
 
-        return { viewData, totalEarningCurrentYear, totalEarningLastYear };
+        return { viewData, totalEarningCurrentYear, totalEarningLastYear, totalVacationDay };
     } catch (error) {
         throw error;
     }

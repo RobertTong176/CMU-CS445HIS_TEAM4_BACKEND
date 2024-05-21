@@ -133,6 +133,7 @@ const getAllDepartment = async (req, res, next) => {
     }
 };
 
+
 export const viewController = {
     getAllPersonal,
     getAllEmployment,

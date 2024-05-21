@@ -4,7 +4,6 @@ import { userService } from '~/services/userService';
 
 const createNewUser = async (req, res, next) => {
     try {
-        console.log('check dataa', req.body);
         const newUser = await userService.createNewUser(req.body);
         res.status(StatusCodes.CREATED).json({
             user: newUser,
