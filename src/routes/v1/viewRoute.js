@@ -14,6 +14,7 @@ Router.get('/employee/department', viewController.getAllDepartment);
 Router.get('/employee', authMiddleware, viewController.getAllEmployeePayroll);
 
 Router.get('/human/employees', authMiddleware, viewController.filterEmployeeHuman);
+//
 Router.get('/payroll/employees', authMiddleware, viewController.filterEmployeePayroll);
 
 export const viewRoute = Router;
