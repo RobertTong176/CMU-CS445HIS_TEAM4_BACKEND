@@ -9,12 +9,17 @@ Router.get('/benefit-plans', authMiddleware, viewController.getAllBenefitPlan);
 Router.get('/job-history', authMiddleware, viewController.getAllJobHistory);
 Router.get('/employment-working-time', authMiddleware, viewController.getAllEmploymentWorkingTime);
 Router.get('/pay-rates', authMiddleware, viewController.getAllPayRates);
+//
 Router.get('/employee/birthday', authMiddleware, viewController.getAllEmployeeBirthday);
+
+//Biểu đồ tròn
 Router.get('/employee/department', viewController.getAllDepartment);
+
 Router.get('/employee', authMiddleware, viewController.getAllEmployeePayroll);
 
 Router.get('/human/employees', authMiddleware, viewController.filterEmployeeHuman);
 //
 Router.get('/payroll/employees', authMiddleware, viewController.filterEmployeePayroll);
+Router.get('/calc-benefit-plans',  viewController.calcBenefitPlans);
 
 export const viewRoute = Router;

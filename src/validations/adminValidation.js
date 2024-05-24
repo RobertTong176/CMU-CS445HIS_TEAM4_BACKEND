@@ -47,7 +47,7 @@ const employeeSchema = Joi.object({
     PAID_TO_DATE: Joi.number().required('Required'),
     PAID_LAST_YEAR: Joi.number().required('Required'),
     SNN: Joi.number().required('Required').integer(),
-    PAY_RATE: Joi.number().required('Required').integer(),
+    PAY_RATE: Joi.string().required('Required'),
 });
 
 const employeeValidate = async (req, res, next) => {

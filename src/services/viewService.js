@@ -101,8 +101,12 @@ const filterEmployeeHuman = async (filters) => {
         if (filters['SHAREHOLDER_STATUS']) {
             filters['SHAREHOLDER_STATUS'] = +filters['SHAREHOLDER_STATUS'];
         }
+        //lấy hết thông tin sql
         const humanData = await getAllDataSqlDb();
+
+        //lấy hết thông tin mySql
         const payrollData = await getAllDataMySqlDb();
+
         const filterData = mergedArray(humanData?.recordsets[0], payrollData);
 
         let filteredEmployees = filterData.filter((item) => {
@@ -128,6 +132,7 @@ const filterEmployeeHuman = async (filters) => {
 
         if (filteredEmployees.length > 0) {
             filteredEmployees.map((item) => {
+                //công thức tinhs
                 let total = item.Value - item['Tax Percentage'] + item['Pay Amount'];
                 const earningCurrentYear = total * item['Paid To Date'];
                 const earningLastYear = total * item['Paid Last Year'];
@@ -144,11 +149,48 @@ const filterEmployeeHuman = async (filters) => {
     }
 };
 
+const calcBenefitPlans = async () => {
+    let totalPlanBenefitShareholder = 0;
+    let nonTotalPlanBenefitShareholder = 0;
+    const request = new sql.Request();
+
+    try {
+        const allBenefitPlans = await request.query('select * from BENEFIT_PLANS');
+        const personalRecords = await request.query('select * from PERSONAL');
+        const allBenefitPlansData = allBenefitPlans.recordset || [];
+        const personalRecordsData = personalRecords.recordset || [];
+
+        personalRecordsData.forEach((personalRecord) => {
+            const matchedBenefitPlan = allBenefitPlansData.find(
+                (benefitPlan) => benefitPlan.BENEFIT_PLANS_ID === personalRecord.BENEFIT_PLAN_ID,
+            );
+            if (!matchedBenefitPlan) return;
+
+            const deductable = matchedBenefitPlan.DEDUCTABLE;
+            const percentageCopay = matchedBenefitPlan.PERCENTAGE_COPAY;
+            const totalBenefit = deductable * percentageCopay;
+
+            if (personalRecord.SHAREHOLDER_STATUS === 0) {
+                nonTotalPlanBenefitShareholder += totalBenefit;
+            } else {
+                totalPlanBenefitShareholder += totalBenefit;
+            }
+        });
+
+        return { nonTotalPlanBenefitShareholder, totalPlanBenefitShareholder };
+
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getAllEmployeeBirthday = async (data) => {
+    //tháng yêu
     const { month } = data;
     const request = new sql.Request();
     try {
         const currentMonth = month || new Date().getMonth() + 1;
+        // const currentMonth = 5
         const query = `
         SELECT *
         FROM PERSONAL
@@ -185,4 +227,5 @@ export const viewService = {
     filterEmployeeHuman,
     getAllEmployeeBirthday,
     getAllDepartment,
+    calcBenefitPlans,
 };

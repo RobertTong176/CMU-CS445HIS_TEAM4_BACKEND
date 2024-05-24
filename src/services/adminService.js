@@ -60,6 +60,7 @@ const deleteEmployeeIfExists = async (id) => {
         }
     });
 };
+
 const deleteEmployee = async (id) => {
     try {
         const request = new sql.Request();
@@ -277,11 +278,12 @@ const addNewEmployee = async (req) => {
     }
 };
 
-const checkVacationDay = async () => {
+const checkVacationDay = async (day) => {
     // console.log('check run', employee);
     return new Promise((resolve, reject) => {
         try {
-            const ALLOWED_VACATION_DAYS = 20;
+            const ALLOWED_VACATION_DAYS = day ? day : 20;
+            //
             const connection = GET_CONNECTION_MYSQL();
             const query = 'SELECT * FROM Employee WHERE `Vacation Days` > ?';
 

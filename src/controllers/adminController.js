@@ -46,9 +46,11 @@ const addNewEmployee = async (req, res, next) => {
         next(error);
     }
 };
+
+
 const checkVacationDay = async (req, res, next) => {
     try {
-        const response = await adminService.addNewEmployee(req);
+        const response = await adminService.checkVacationDay(req.params.days);
         res.status(StatusCodes.CREATED).json(response);
     } catch (error) {
         next(error);
